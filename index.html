@@ -1,1 +1,682 @@
-dddd
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KUCE — 대학 탄소중립 정보공개 플랫폼</title>
+<style>
+:root{
+  --bg:#F2F7FC;            /* 연파랑 배경 */
+  --bg-deep:#E3EEF9;
+  --card:#FFFFFF;
+  --ink:#1E3A54;           /* 본문 잉크(짙은 청회색) */
+  --ink-soft:#5C7891;
+  --line:#D7E5F2;
+  --primary:#4A90D9;       /* 메인 연파랑 */
+  --primary-deep:#2F6FB2;
+  --primary-pale:#DCEBFA;
+  --mint:#3FA796;          /* 감소(긍정) */
+  --coral:#E2705B;         /* 증가(주의) */
+  --gold:#F2B24C;          /* 우리 학교 하이라이트 */
+  --gold-pale:#FDF3DF;
+  --radius:14px;
+  --shadow:0 2px 10px rgba(47,111,178,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.55;
+  letter-spacing:-.01em;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit}
+
+/* ---------- 상단 고정 바 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  max-width:1080px;margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;gap:16px;
+}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:20px;color:var(--primary-deep);cursor:pointer;white-space:nowrap}
+.logo .leaf{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--primary),#7FB8EA);display:grid;place-items:center;color:#fff;font-size:15px}
+.searchwrap{position:relative;flex:1;max-width:520px}
+.searchwrap input{
+  width:100%;padding:10px 40px 10px 14px;border:1.5px solid var(--line);
+  border-radius:999px;font-size:14px;background:#fff;color:var(--ink);outline:none;
+  transition:border-color .15s;
+}
+.searchwrap input:focus{border-color:var(--primary)}
+.searchwrap .sicon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--primary);font-size:15px}
+.search-drop{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;
+  border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);
+  max-height:280px;overflow:auto;display:none;z-index:60;
+}
+.search-drop.open{display:block}
+.search-drop button{display:flex;justify-content:space-between;width:100%;padding:10px 14px;font-size:14px;text-align:left}
+.search-drop button:hover{background:var(--primary-pale)}
+.search-drop .rk{color:var(--ink-soft);font-size:12px}
+.myschool-chip{
+  display:none;align-items:center;gap:6px;background:var(--gold-pale);
+  border:1px solid var(--gold);color:#8a6420;border-radius:999px;
+  padding:6px 12px;font-size:13px;font-weight:700;white-space:nowrap;
+}
+.myschool-chip.on{display:flex}
+.myschool-chip .x{cursor:pointer;font-weight:400;opacity:.6}
+
+/* ---------- 공통 레이아웃 ---------- */
+.page{max-width:1080px;margin:0 auto;padding:28px 20px 110px;display:none}
+.page.active{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.section-title{font-size:17px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.muted{color:var(--ink-soft);font-size:13px}
+.pill-btn{
+  background:var(--primary);color:#fff;border-radius:999px;padding:10px 20px;
+  font-size:14px;font-weight:700;transition:background .15s;
+}
+.pill-btn:hover{background:var(--primary-deep)}
+.ghost-btn{
+  border:1.5px solid var(--line);border-radius:999px;padding:8px 16px;
+  font-size:13px;font-weight:600;color:var(--primary-deep);background:#fff;transition:.15s;
+}
+.ghost-btn:hover{border-color:var(--primary);background:var(--primary-pale)}
+
+/* ---------- 홈: 히어로 ---------- */
+.hero{
+  background:linear-gradient(135deg,#CFE4F8 0%,#EAF4FD 60%,#F6FAFE 100%);
+  border:1px solid var(--line);border-radius:20px;padding:34px 32px;position:relative;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,rgba(74,144,217,.18),transparent 70%);
+}
+.hero .eyebrow{font-size:13px;font-weight:700;color:var(--primary-deep);letter-spacing:.04em;margin-bottom:6px}
+.hero h1{font-size:clamp(22px,3.4vw,32px);font-weight:800;line-height:1.3}
+.hero .sum{
+  display:inline-flex;align-items:center;gap:10px;margin-top:16px;
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-size:14px;font-weight:600;
+}
+.hero .sum .delta{font-size:18px;font-weight:800}
+.delta.down{color:var(--mint)} .delta.up{color:var(--coral)}
+.hero .updated{margin-top:10px;font-size:12px;color:var(--ink-soft)}
+
+/* ---------- 홈: 전국 카드 ---------- */
+.natgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+@media(max-width:760px){.natgrid{grid-template-columns:1fr}}
+.natcard{padding:22px 22px 18px;display:flex;flex-direction:column;gap:6px}
+.natcard .head{display:flex;justify-content:space-between;align-items:flex-start}
+.natcard .label{font-size:14px;font-weight:700;color:var(--ink-soft)}
+.natcard .big{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.natcard .big small{font-size:14px;font-weight:600;color:var(--ink-soft);margin-left:4px}
+.natcard .chg{font-size:16px;font-weight:800;margin-top:2px}
+.minichart{margin-top:12px;height:120px;display:flex;align-items:flex-end;gap:10px}
+.minichart .bar{
+  flex:1;border-radius:8px 8px 4px 4px;position:relative;
+  background:linear-gradient(180deg,#7FB8EA,var(--primary));
+  min-height:8px;transition:height .5s ease;
+}
+.minichart .bar.last{background:linear-gradient(180deg,#4A90D9,#2F6FB2)}
+.minichart .bar span{
+  position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);
+  font-size:11px;color:var(--ink-soft);white-space:nowrap;
+}
+.minichart-pad{height:22px}
+
+/* ---------- sticky CTA ---------- */
+.sticky-cta{
+  position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;
+  background:var(--primary-deep);color:#fff;border-radius:999px;
+  padding:14px 28px;font-size:15px;font-weight:800;
+  box-shadow:0 8px 24px rgba(47,111,178,.35);display:flex;gap:8px;align-items:center;
+  transition:transform .15s;
+}
+.sticky-cta:hover{transform:translateX(-50%) scale(1.03)}
+
+/* ---------- 비교 페이지 ---------- */
+.tabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin-bottom:18px}
+.tabs button{
+  padding:10px 18px;font-size:15px;font-weight:700;color:var(--ink-soft);
+  border-bottom:3px solid transparent;margin-bottom:-2px;transition:.15s;
+}
+.tabs button.on{color:var(--primary-deep);border-color:var(--primary)}
+.filterbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  border:1.5px solid var(--line);background:#fff;border-radius:999px;
+  padding:7px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);transition:.15s;
+}
+.chip.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.rankwrap{padding:18px 18px 12px}
+.rankrow{
+  display:grid;grid-template-columns:44px 150px 1fr 110px;gap:10px;align-items:center;
+  padding:7px 8px;border-radius:10px;cursor:pointer;transition:background .12s;
+}
+.rankrow:hover{background:var(--primary-pale)}
+.rankrow .num{font-weight:800;color:var(--ink-soft);font-size:14px;text-align:center}
+.rankrow .name{font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rankrow .barcell{background:var(--bg-deep);border-radius:8px;height:22px;overflow:hidden}
+.rankrow .barfill{
+  height:100%;border-radius:8px;
+  background:linear-gradient(90deg,#8FC3EE,var(--primary));
+  transition:width .6s cubic-bezier(.2,.8,.2,1);
+}
+.rankrow .val{font-size:13px;font-weight:700;text-align:right;color:var(--ink);white-space:nowrap}
+.rankrow.mine{background:var(--gold-pale);outline:2px solid var(--gold)}
+.rankrow.mine .barfill{background:linear-gradient(90deg,#F6CF87,var(--gold))}
+.rankrow.mine .name::after{content:" 🏫";font-size:12px}
+.rank-note{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px}
+
+/* ---------- 상세 페이지 ---------- */
+.detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.detail-head h2{font-size:26px;font-weight:800}
+.badge-rank{
+  display:inline-flex;align-items:center;gap:8px;margin-top:8px;
+  background:var(--primary-pale);color:var(--primary-deep);
+  border-radius:999px;padding:8px 18px;font-size:20px;font-weight:800;
+}
+.badge-rank small{font-size:13px;font-weight:700;color:var(--ink-soft)}
+.iconbtn{
+  width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);
+  background:#fff;font-size:17px;display:grid;place-items:center;transition:.15s;
+}
+.iconbtn:hover{border-color:var(--primary);background:var(--primary-pale)}
+.kpigrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:18px 0}
+.kpi{padding:16px 18px}
+.kpi .k-label{font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+.kpi .k-val{font-size:22px;font-weight:800;margin-top:2px}
+.kpi .k-val small{font-size:12px;color:var(--ink-soft);font-weight:600;margin-left:3px}
+.kpi .k-chg{font-size:13px;font-weight:800;margin-top:2px}
+.linechart-card{padding:20px}
+.linechart-card svg{width:100%;height:auto;display:block}
+.infogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.inforow{padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.inforow .il{font-size:12px;font-weight:700;color:var(--ink-soft)}
+.inforow .iv{font-size:15px;font-weight:700}
+.simgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.simcard{padding:14px 16px;cursor:pointer;transition:.15s}
+.simcard:hover{border-color:var(--primary);transform:translateY(-2px)}
+.simcard .sn{font-weight:800;font-size:14px}
+.simcard .sv{font-size:12.5px;color:var(--ink-soft);margin-top:4px}
+.detail-cta{display:flex;justify-content:center;margin-top:26px}
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:#fff;padding:10px 20px;border-radius:999px;
+  font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:70;
+}
+.toast.show{opacity:1}
+.crumb{font-size:13px;color:var(--ink-soft);margin-bottom:14px;display:flex;gap:6px;align-items:center}
+.crumb button{color:var(--primary-deep);font-weight:700;font-size:13px}
+.crumb button:hover{text-decoration:underline}
+.foot{max-width:1080px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:var(--ink-soft)}
+@media(max-width:640px){
+  .rankrow{grid-template-columns:32px 96px 1fr 84px;gap:6px}
+  .rankrow .name{font-size:12.5px}
+  .rankrow .val{font-size:11.5px}
+  .topbar-inner{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- 상단 고정 바 -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="logo" onclick="go('home')"><span class="leaf">🌿</span>KUCE</div>
+    <div class="searchwrap">
+      <input id="searchInput" type="text" placeholder="대학명 검색 — 우리 학교를 찾아보세요" autocomplete="off">
+      <span class="sicon">🔍</span>
+      <div class="search-drop" id="searchDrop"></div>
+    </div>
+    <div class="myschool-chip" id="myChip">
+      <span id="myChipName"></span><span class="x" onclick="clearMySchool(event)">✕</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 홈 ================= -->
+<main class="page active" id="page-home">
+  <section class="hero">
+    <div class="eyebrow">KOREAN UNIVERSITIES FOR CARBON &amp; ENERGY REDUCTION</div>
+    <h1>2026 전국 대학 탄소배출 현황</h1>
+    <div class="sum">
+      전국 대학 탄소배출량, 전년 대비
+      <span class="delta down" id="heroDelta">−3.1%</span>
+      감소
+    </div>
+    <div class="updated" id="heroUpdated">데이터 출처: 온실가스종합정보센터·대학알리미 (샘플) · 최근 업데이트 2026.07</div>
+  </section>
+
+  <div class="natgrid">
+    <div class="card natcard">
+      <div class="head">
+        <div>
+          <div class="label">전국 대학 탄소배출량</div>
+          <div class="big" id="natCarbonVal"></div>
+          <div class="chg" id="natCarbonChg"></div>
+        </div>
+        <button class="ghost-btn" onclick="go('compare','carbon')">전체보기</button>
+      </div>
+      <div class="minichart" id="natCarbonChart"></div>
+      <div class="minichart-pad"></div>
+    </div>
+    <div class="card natcard">
+      <div class="head">
+        <div>
+          <div class="label">전국 대학 에너지사용량</div>
+          <div class="big" id="natEnergyVal"></div>
+          <div class="chg" id="natEnergyChg"></div>
+        </div>
+        <button class="ghost-btn" onclick="go('compare','energy')">전체보기</button>
+      </div>
+      <div class="minichart" id="natEnergyChart"></div>
+      <div class="minichart-pad"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ================= 비교 페이지 ================= -->
+<main class="page" id="page-compare">
+  <div class="crumb"><button onclick="go('home')">홈</button> › 학교 비교 데이터</div>
+  <div class="tabs">
+    <button id="tab-carbon" onclick="setTab('carbon')">탄소배출량</button>
+    <button id="tab-energy" onclick="setTab('energy')">에너지사용량</button>
+  </div>
+  <div class="filterbar">
+    <div class="chips" id="filterChips"></div>
+    <button class="ghost-btn" onclick="downloadCSV()">⬇ 데이터 다운로드 (CSV)</button>
+  </div>
+  <div class="card rankwrap" id="rankList"></div>
+  <div class="rank-note">
+    <span class="muted">배출량·사용량이 낮은 순으로 정렬됩니다. 막대를 클릭하면 학교 상세 페이지로 이동합니다.</span>
+    <span class="muted" id="rankUnit"></span>
+  </div>
+</main>
+
+<!-- ================= 상세 페이지 ================= -->
+<main class="page" id="page-detail">
+  <div class="crumb">
+    <button onclick="go('home')">홈</button> ›
+    <button onclick="go('compare')">학교 비교 데이터</button> ›
+    <span id="crumbSchool"></span>
+  </div>
+  <div class="detail-head">
+    <div>
+      <h2 id="dName"></h2>
+      <div class="badge-rank" id="dBadge"></div>
+    </div>
+    <button class="iconbtn" title="공유하기" onclick="shareSchool()">🔗</button>
+  </div>
+
+  <div class="kpigrid" id="dKpis"></div>
+
+  <div class="tabs" style="margin-top:6px">
+    <button id="dtab-carbon" onclick="setDetailTab('carbon')">탄소배출량</button>
+    <button id="dtab-energy" onclick="setDetailTab('energy')">에너지사용량</button>
+    <button id="dtab-info" onclick="setDetailTab('info')">기타정보</button>
+  </div>
+
+  <div id="dChartArea" class="card linechart-card"></div>
+  <div id="dInfoArea" class="infogrid" style="display:none"></div>
+
+  <h3 class="section-title" style="margin-top:26px">비슷한 규모의 학교</h3>
+  <div class="simgrid" id="dSimilar"></div>
+
+  <div class="detail-cta">
+    <button class="pill-btn" onclick="compareWithOthers()">다른 학교와 비교하기 →</button>
+  </div>
+</main>
+
+<button class="sticky-cta" id="stickyCta" onclick="ctaClick()">🏫 우리 학교 비교하기</button>
+<div class="toast" id="toast"></div>
+
+<footer class="foot">
+  ※ 본 화면의 수치는 플랫폼 구조 검증을 위한 <b>샘플 데이터</b>입니다. 실제 서비스 시 온실가스종합정보센터(배출권거래제·목표관리제 명세서),
+  대학알리미(재학생·교직원 수, 연면적) 데이터로 교체됩니다. · 대학탄소중립협의체 2기
+</footer>
+
+<script>
+/* ============================================================
+   [데이터 영역] — 실제 데이터로 교체할 때는 이 부분만 수정하면 됩니다.
+   각 학교: 이름, 제도유형, 총구성원수(명), 연면적(㎡),
+   기준배출량(tCO2e), 연도별 탄소배출량(tCO2e), 연도별 에너지사용량(TJ),
+   탄소배출권 구매액(백만원)
+============================================================ */
+const YEARS=[2021,2022,2023,2024,2025,2026];
+const SCHOOLS=[
+ // name, 제도(ETS=배출권거래제/TMS=목표관리제/N=미포함), 구성원수, 연면적㎡, 기준배출량, 2021~2026 탄소(tCO2e), 2021~2026 에너지(TJ), 배출권구매액(백만원)
+ {n:"서울대학교",  s:"ETS", p:34500, a:1620000, b:118000, c:[121000,118500,115200,112800,110300,107600], e:[2380,2330,2270,2225,2180,2128], k:420},
+ {n:"연세대학교",  s:"ETS", p:29800, a:1280000, b:96000,  c:[99500,97800,95600,93400,91800,89500],       e:[1960,1925,1885,1842,1810,1766], k:355},
+ {n:"고려대학교",  s:"ETS", p:28400, a:1150000, b:88000,  c:[90200,89100,87300,85900,84100,82400],       e:[1780,1758,1723,1695,1660,1626], k:310},
+ {n:"한양대학교",  s:"ETS", p:24600, a:  920000, b:71000,  c:[73400,72100,70800,69300,68200,66800],       e:[1450,1424,1398,1369,1347,1320], k:240},
+ {n:"성균관대학교",s:"ETS", p:25100, a:  980000, b:74000,  c:[75800,74600,73900,72500,71100,69400],       e:[1497,1473,1460,1432,1404,1371], k:265},
+ {n:"경희대학교",  s:"TMS", p:23800, a:  890000, b:62000,  c:[64100,63500,62200,61400,60100,59200],       e:[1266,1254,1229,1213,1187,1170], k:150},
+ {n:"중앙대학교",  s:"TMS", p:20900, a:  760000, b:54000,  c:[55600,54900,54100,53200,52600,51500],       e:[1098,1084,1069,1051,1039,1017], k:120},
+ {n:"이화여자대학교",s:"TMS",p:17200, a:  640000, b:45000,  c:[46300,45700,45100,44300,43600,42800],       e:[915, 903, 891, 875, 861, 846 ], k:95},
+ {n:"서강대학교",  s:"TMS", p: 9800, a:  330000, b:24000,  c:[24800,24500,24100,23700,23300,22900],       e:[490, 484, 476, 468, 460, 452 ], k:48},
+ {n:"부산대학교",  s:"ETS", p:22600, a:  980000, b:66000,  c:[68200,67400,66300,65100,64200,63000],       e:[1347,1332,1310,1286,1268,1245], k:190},
+ {n:"경북대학교",  s:"ETS", p:21800, a:  940000, b:61000,  c:[63100,62400,61500,60600,59800,58700],       e:[1247,1233,1215,1197,1181,1160], k:170},
+ {n:"전남대학교",  s:"TMS", p:19400, a:  870000, b:52000,  c:[53800,53100,52400,51600,50900,50100],       e:[1063,1049,1035,1019,1006,990 ], k:110},
+ {n:"전북대학교",  s:"TMS", p:18100, a:  820000, b:47000,  c:[48600,48100,47300,46700,46000,45300],       e:[960, 950, 934, 923, 909, 895 ], k:100},
+ {n:"충남대학교",  s:"TMS", p:17600, a:  790000, b:45500,  c:[47100,46500,45900,45200,44600,43900],       e:[930, 919, 907, 893, 881, 867 ], k:92},
+ {n:"충북대학교",  s:"TMS", p:14800, a:  660000, b:37000,  c:[38300,37900,37400,36800,36300,35700],       e:[757, 749, 739, 727, 717, 705 ], k:70},
+ {n:"인하대학교",  s:"TMS", p:16900, a:  610000, b:42000,  c:[43400,42900,42300,41700,41100,40500],       e:[858, 848, 836, 824, 812, 800 ], k:85},
+ {n:"아주대학교",  s:"TMS", p:12400, a:  450000, b:31000,  c:[32100,31700,31300,30800,30400,29900],       e:[634, 626, 618, 609, 601, 591 ], k:58},
+ {n:"건국대학교",  s:"TMS", p:19200, a:  720000, b:49000,  c:[50700,50100,49400,48700,48100,47300],       e:[1002,990, 976, 962, 950, 935 ], k:105},
+ {n:"국민대학교",  s:"N",   p:13600, a:  420000, b:0,      c:[29800,29500,29100,28700,28300,27900],       e:[589, 583, 575, 567, 559, 551 ], k:0},
+ {n:"수원대학교",  s:"N",   p: 9200, a:  310000, b:0,      c:[19600,19400,19100,18900,18600,18400],       e:[387, 383, 377, 373, 368, 363 ], k:0},
+ {n:"세종대학교",  s:"TMS", p:12900, a:  430000, b:29500,  c:[30600,30200,29800,29400,29000,28600],       e:[605, 597, 589, 581, 573, 565 ], k:52},
+ {n:"UNIST",     s:"TMS", p: 5600, a:  360000, b:33000,  c:[34200,33900,33500,33100,32800,32400],       e:[676, 670, 662, 654, 648, 640 ], k:64},
+ {n:"KAIST",     s:"ETS", p:11800, a:  680000, b:62000,  c:[64500,63800,63000,62300,61700,60900],       e:[1274,1261,1245,1231,1219,1203], k:210},
+ {n:"POSTECH",   s:"ETS", p: 4900, a:  420000, b:41000,  c:[42600,42100,41600,41200,40700,40200],       e:[842, 832, 822, 814, 804, 794 ], k:130}
+];
+/* ============================================================ */
+
+const LAST=YEARS.length-1;
+let mySchool=null;         // 선택된 '우리 학교' 이름
+let curTab='carbon';       // 비교 페이지 탭
+let curFilter='total';     // total | percap | perarea
+let curSchool=null;        // 상세 페이지 학교
+let dTab='carbon';         // 상세 페이지 탭
+
+const fmt=n=>n.toLocaleString('ko-KR');
+const fmt1=n=>n.toLocaleString('ko-KR',{maximumFractionDigits:1});
+const fmt2=n=>n.toLocaleString('ko-KR',{maximumFractionDigits:2});
+
+function metricVal(s,tab,filter,yi=LAST){
+  const base = tab==='carbon' ? s.c[yi] : s.e[yi];
+  if(filter==='percap') return base/s.p*1000;   // 1인당(탄소:kgCO2e/명 → *1000, 에너지:GJ/명 → *1000)
+  if(filter==='perarea')return base/s.a*1000;   // 면적당
+  return base;
+}
+function unitOf(tab,filter){
+  if(tab==='carbon'){
+    if(filter==='percap') return 'kgCO₂e/명';
+    if(filter==='perarea')return 'kgCO₂e/㎡';
+    return 'tCO₂e';
+  }else{
+    if(filter==='percap') return 'GJ/명';
+    if(filter==='perarea')return 'GJ/㎡';
+    return 'TJ';
+  }
+}
+function chg(arr){const p=arr[LAST-1],c=arr[LAST];return (c-p)/p*100;}
+function deltaHTML(v,inline){
+  const cls=v<=0?'down':'up';
+  const arrow=v<=0?'▼':'▲';
+  return `<span class="delta ${cls}" ${inline?'':''}>${arrow} ${Math.abs(v).toFixed(1)}%</span>`;
+}
+
+/* ---------- 페이지 전환 ---------- */
+function go(page,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(page==='compare'){ if(tab) curTab=tab; renderCompare(); }
+  if(page==='home') renderHome();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ---------- 홈 ---------- */
+function natTotals(key){
+  return YEARS.map((_,yi)=>SCHOOLS.reduce((a,s)=>a+s[key][yi],0));
+}
+function renderHome(){
+  const c=natTotals('c'), e=natTotals('e');
+  const cChg=chg(c), eChg=chg(e);
+  document.getElementById('heroDelta').outerHTML=deltaHTML(cChg).replace('class="delta','id="heroDelta" class="delta');
+  document.getElementById('natCarbonVal').innerHTML=fmt(Math.round(c[LAST]/1000))+'<small>천 tCO₂e</small>';
+  document.getElementById('natEnergyVal').innerHTML=fmt(Math.round(e[LAST]))+'<small>TJ</small>';
+  document.getElementById('natCarbonChg').innerHTML='전년 대비 '+deltaHTML(cChg);
+  document.getElementById('natEnergyChg').innerHTML='전년 대비 '+deltaHTML(eChg);
+  drawMini('natCarbonChart',c); drawMini('natEnergyChart',e);
+}
+function drawMini(id,arr){
+  const el=document.getElementById(id); el.innerHTML='';
+  const max=Math.max(...arr);
+  arr.forEach((v,i)=>{
+    const b=document.createElement('div');
+    b.className='bar'+(i===LAST?' last':'');
+    b.style.height=(v/max*100)+'%';
+    b.innerHTML=`<span>${YEARS[i]}</span>`;
+    b.title=fmt(Math.round(v));
+    el.appendChild(b);
+  });
+}
+
+/* ---------- 검색 ---------- */
+const sInput=document.getElementById('searchInput');
+const sDrop=document.getElementById('searchDrop');
+sInput.addEventListener('input',()=>{
+  const q=sInput.value.trim().toLowerCase();
+  if(!q){sDrop.classList.remove('open');return;}
+  const ranked=[...SCHOOLS].sort((a,b)=>a.c[LAST]-b.c[LAST]);
+  const hits=ranked.map((s,i)=>({s,rank:i+1}))
+    .filter(o=>o.s.n.toLowerCase().includes(q)).slice(0,8);
+  sDrop.innerHTML = hits.length
+    ? hits.map(o=>`<button onclick="pickSchool('${o.s.n}')"><span>${o.s.n}</span><span class="rk">탄소배출 전국 ${o.rank}위</span></button>`).join('')
+    : `<button disabled style="color:var(--ink-soft)">검색 결과가 없습니다</button>`;
+  sDrop.classList.add('open');
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.searchwrap')) sDrop.classList.remove('open');
+});
+function pickSchool(name){
+  sDrop.classList.remove('open'); sInput.value='';
+  if(!mySchool){ setMySchool(name); }
+  openDetail(name);
+}
+function setMySchool(name){
+  mySchool=name;
+  const chip=document.getElementById('myChip');
+  document.getElementById('myChipName').textContent='우리 학교: '+name;
+  chip.classList.add('on');
+  toast(`'${name}'을(를) 우리 학교로 설정했어요`);
+}
+function clearMySchool(e){
+  e.stopPropagation(); mySchool=null;
+  document.getElementById('myChip').classList.remove('on');
+  if(document.getElementById('page-compare').classList.contains('active')) renderCompare();
+}
+function ctaClick(){
+  if(mySchool){ go('compare'); }
+  else{ sInput.focus(); toast('먼저 검색창에서 우리 학교를 선택해 주세요'); }
+}
+
+/* ---------- 비교 페이지 ---------- */
+function setTab(t){ curTab=t; if(t==='energy'&&curFilter==='total') curFilter='percap'; if(t==='carbon'&&!['total','percap','perarea'].includes(curFilter)) curFilter='total'; renderCompare(); }
+function setFilter(f){ curFilter=f; renderCompare(); }
+function renderCompare(){
+  document.getElementById('tab-carbon').classList.toggle('on',curTab==='carbon');
+  document.getElementById('tab-energy').classList.toggle('on',curTab==='energy');
+  // 필터: 탄소=총/1인당/면적당, 에너지=1인당/면적당 (기획안 3-2)
+  const defs = curTab==='carbon'
+    ? [['total','총배출량'],['percap','1인당'],['perarea','면적당']]
+    : [['percap','1인당'],['perarea','면적당']];
+  if(!defs.some(d=>d[0]===curFilter)) curFilter=defs[0][0];
+  document.getElementById('filterChips').innerHTML=defs.map(([k,l])=>
+    `<button class="chip ${curFilter===k?'on':''}" onclick="setFilter('${k}')">${l}</button>`).join('');
+  const unit=unitOf(curTab,curFilter);
+  document.getElementById('rankUnit').textContent='단위: '+unit;
+
+  const rows=SCHOOLS.map(s=>({s,v:metricVal(s,curTab,curFilter)})).sort((a,b)=>a.v-b.v);
+  const max=Math.max(...rows.map(r=>r.v));
+  const list=document.getElementById('rankList');
+  list.innerHTML=rows.map((r,i)=>{
+    const mine=r.s.n===mySchool?' mine':'';
+    const valTxt = curFilter==='total'
+      ? fmt(Math.round(r.v)) : (r.v>=100?fmt(Math.round(r.v)):fmt2(r.v));
+    return `<div class="rankrow${mine}" onclick="openDetail('${r.s.n}')">
+      <div class="num">${i+1}</div>
+      <div class="name">${r.s.n}</div>
+      <div class="barcell"><div class="barfill" style="width:0%" data-w="${(r.v/max*100).toFixed(1)}"></div></div>
+      <div class="val">${valTxt}</div>
+    </div>`;
+  }).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    list.querySelectorAll('.barfill').forEach(b=>b.style.width=b.dataset.w+'%');
+  }));
+  // 우리 학교로 스크롤 힌트
+  const mine=list.querySelector('.rankrow.mine');
+  if(mine) setTimeout(()=>mine.scrollIntoView({block:'center',behavior:'smooth'}),350);
+}
+function downloadCSV(){
+  const unit=unitOf(curTab,curFilter);
+  let csv='\uFEFF순위,학교명,값('+unit+'),제도유형,총구성원수(명),연면적(㎡)\n';
+  const rows=SCHOOLS.map(s=>({s,v:metricVal(s,curTab,curFilter)})).sort((a,b)=>a.v-b.v);
+  rows.forEach((r,i)=>{csv+=`${i+1},${r.s.n},${r.v.toFixed(2)},${instName(r.s.s)},${r.s.p},${r.s.a}\n`;});
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`KUCE_${curTab==='carbon'?'탄소배출량':'에너지사용량'}_${curFilter}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('CSV 파일을 다운로드했어요');
+}
+function instName(s){return s==='ETS'?'배출권거래제':s==='TMS'?'목표관리제':'미포함';}
+
+/* ---------- 상세 페이지 ---------- */
+function openDetail(name){
+  curSchool=SCHOOLS.find(s=>s.n===name);
+  if(!curSchool) return;
+  dTab='carbon';
+  renderDetail();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-detail').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function rankOf(s,tab='carbon'){
+  const sorted=[...SCHOOLS].sort((a,b)=>metricVal(a,tab,'total')-metricVal(b,tab,'total'));
+  return sorted.findIndex(x=>x.n===s.n)+1;
+}
+function renderDetail(){
+  const s=curSchool;
+  document.getElementById('crumbSchool').textContent=s.n;
+  document.getElementById('dName').textContent=s.n;
+  const rk=rankOf(s,'carbon');
+  document.getElementById('dBadge').innerHTML=`전국 ${rk}위 <small>/ ${SCHOOLS.length}개교 · 탄소배출량 낮은 순</small>`;
+
+  const cChg=chg(s.c), eChg=chg(s.e);
+  const dev = s.b>0 ? s.c[LAST]-s.b : null;               // 기준대비 증감량
+  const devPct = s.b>0 ? (s.c[LAST]-s.b)/s.b*100 : null;  // 기준대비 증감률
+  document.getElementById('dKpis').innerHTML=`
+    <div class="card kpi"><div class="k-label">탄소배출량 (2026)</div>
+      <div class="k-val">${fmt(s.c[LAST])}<small>tCO₂e</small></div>
+      <div class="k-chg">${deltaHTML(cChg)} <span class="muted">전년 대비</span></div></div>
+    <div class="card kpi"><div class="k-label">에너지사용량 (2026)</div>
+      <div class="k-val">${fmt(s.e[LAST])}<small>TJ</small></div>
+      <div class="k-chg">${deltaHTML(eChg)} <span class="muted">전년 대비</span></div></div>
+    <div class="card kpi"><div class="k-label">1인당 탄소배출량</div>
+      <div class="k-val">${fmt1(s.c[LAST]/s.p*1000)}<small>kgCO₂e/명</small></div>
+      <div class="k-chg"><span class="muted">총구성원 ${fmt(s.p)}명 기준</span></div></div>
+    <div class="card kpi"><div class="k-label">기준배출량 대비</div>
+      <div class="k-val">${dev===null?'—':(dev<=0?'−':'+')+fmt(Math.abs(Math.round(dev)))}<small>${dev===null?'기준 없음':'tCO₂e'}</small></div>
+      <div class="k-chg">${devPct===null?'<span class="muted">제도 미포함</span>':deltaHTML(devPct)+' <span class="muted">'+(dev<=0?'감축 여유분 확보':'초과 배출')+'</span>'}</div></div>`;
+
+  setDetailTab(dTab);
+  renderSimilar();
+}
+function setDetailTab(t){
+  dTab=t;
+  ['carbon','energy','info'].forEach(k=>
+    document.getElementById('dtab-'+k).classList.toggle('on',k===t));
+  const chartArea=document.getElementById('dChartArea');
+  const infoArea=document.getElementById('dInfoArea');
+  if(t==='info'){
+    chartArea.style.display='none'; infoArea.style.display='grid';
+    renderInfo();
+  }else{
+    chartArea.style.display='block'; infoArea.style.display='none';
+    drawLine(chartArea, t==='carbon'?curSchool.c:curSchool.e,
+      t==='carbon'?'탄소배출량 (tCO₂e)':'에너지사용량 (TJ)');
+  }
+}
+function renderInfo(){
+  const s=curSchool;
+  const items=[
+    ['제도유형',instName(s.s)],
+    ['총구성원수(재학생+교원+직원)',fmt(s.p)+'명'],
+    ['캠퍼스 연면적',fmt(s.a)+'㎡'],
+    ['기준배출량',s.b>0?fmt(s.b)+' tCO₂e':'해당 없음'],
+    ['기준대비 증감량',s.b>0?((s.c[LAST]-s.b<=0?'−':'+')+fmt(Math.abs(s.c[LAST]-s.b))+' tCO₂e'):'—'],
+    ['기준대비 증감률',s.b>0?((s.c[LAST]-s.b)/s.b*100).toFixed(1)+'%':'—'],
+    ['감축 여유분',s.b>0&&s.c[LAST]<=s.b?fmt(s.b-s.c[LAST])+' tCO₂e':'—'],
+    ['초과 배출량',s.b>0&&s.c[LAST]>s.b?fmt(s.c[LAST]-s.b)+' tCO₂e':'없음'],
+    ['탄소배출권 구매액(연간)',s.k>0?fmt(s.k)+'백만 원':'—'],
+    ['면적당 탄소배출량',fmt2(s.c[LAST]/s.a*1000)+' kgCO₂e/㎡'],
+    ['면적당 에너지사용량',fmt2(s.e[LAST]/s.a*1000)+' GJ/㎡'],
+    ['1인당 에너지사용량',fmt1(s.e[LAST]/s.p*1000)+' GJ/명'],
+  ];
+  document.getElementById('dInfoArea').innerHTML=items.map(([l,v])=>
+    `<div class="card inforow"><span class="il">${l}</span><span class="iv">${v}</span></div>`).join('');
+}
+function drawLine(container,arr,label){
+  const W=760,H=280,P={l:64,r:20,t:24,b:34};
+  const min=Math.min(...arr)*0.985, max=Math.max(...arr)*1.015;
+  const x=i=>P.l+(W-P.l-P.r)*i/(arr.length-1);
+  const y=v=>P.t+(H-P.t-P.b)*(1-(v-min)/(max-min));
+  let grid='',labels='';
+  for(let g=0;g<=3;g++){
+    const gv=min+(max-min)*g/3, gy=y(gv);
+    grid+=`<line x1="${P.l}" y1="${gy}" x2="${W-P.r}" y2="${gy}" stroke="#E3EEF9" stroke-width="1.5"/>`;
+    labels+=`<text x="${P.l-8}" y="${gy+4}" text-anchor="end" font-size="11" fill="#5C7891">${fmt(Math.round(gv))}</text>`;
+  }
+  const pts=arr.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+  const area=`${P.l},${H-P.b} ${pts} ${W-P.r},${H-P.b}`;
+  let dots='',xls='';
+  arr.forEach((v,i)=>{
+    dots+=`<circle cx="${x(i)}" cy="${y(v)}" r="${i===LAST?6:4.5}" fill="${i===LAST?'#2F6FB2':'#4A90D9'}" stroke="#fff" stroke-width="2"><title>${YEARS[i]}년: ${fmt(v)}</title></circle>`;
+    xls+=`<text x="${x(i)}" y="${H-P.b+20}" text-anchor="middle" font-size="11.5" fill="#5C7891">${YEARS[i]}</text>`;
+  });
+  const lastV=arr[LAST];
+  container.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+      <b style="font-size:14.5px">연도별 ${label}</b>
+      <span class="muted">2026년: <b style="color:var(--primary-deep)">${fmt(lastV)}</b></span>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="연도별 ${label} 추이">
+      ${grid}${labels}
+      <polygon points="${area}" fill="rgba(74,144,217,.12)"/>
+      <polyline points="${pts}" fill="none" stroke="#4A90D9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      ${dots}${xls}
+    </svg>
+    <div class="muted" style="margin-top:6px">점에 마우스를 올리면 연도별 수치를 확인할 수 있어요.</div>`;
+}
+function renderSimilar(){
+  const s=curSchool;
+  const sims=[...SCHOOLS].filter(x=>x.n!==s.n)
+    .sort((a,b)=>Math.abs(a.p-s.p)-Math.abs(b.p-s.p)).slice(0,3);
+  document.getElementById('dSimilar').innerHTML=sims.map(x=>{
+    const r=rankOf(x,'carbon');
+    return `<div class="card simcard" onclick="openDetail('${x.n}')">
+      <div class="sn">${x.n} <span class="muted">· 전국 ${r}위</span></div>
+      <div class="sv">구성원 ${fmt(x.p)}명 · ${fmt(x.c[LAST])} tCO₂e</div>
+    </div>`;
+  }).join('');
+}
+function shareSchool(){
+  const s=curSchool, r=rankOf(s,'carbon');
+  const txt=`[KUCE] ${s.n} — 대학 탄소배출량 전국 ${r}위 / ${SCHOOLS.length}개교 · 2026년 ${fmt(s.c[LAST])} tCO₂e (전년 대비 ${chg(s.c).toFixed(1)}%)`;
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(()=>toast('공유 문구를 복사했어요! SNS에 붙여넣기 하세요 📋')); }
+  else toast(txt);
+}
+function compareWithOthers(){
+  if(curSchool && !mySchool) setMySchool(curSchool.n);
+  else if(curSchool) mySchool=curSchool.n, setMySchool(curSchool.n);
+  go('compare');
+}
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+renderHome();
+</script>
+</body>
+</html>
